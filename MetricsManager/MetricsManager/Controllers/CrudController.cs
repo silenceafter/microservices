@@ -10,8 +10,7 @@ namespace MetricsManager.Controllers
     [ApiController]
     public class CrudController : Controller
     {
-        private readonly ValuesHolder _holder;
-        public ValuesHolder holder { get { return _holder; } set { } }
+        private readonly ValuesHolder _holder;       
 
         public CrudController(ValuesHolder holder)
         {
@@ -21,23 +20,23 @@ namespace MetricsManager.Controllers
         [HttpPost("create")]
         public IActionResult Create([FromQuery] int temperature, [FromQuery] DateTime time)
         {
-            holder.Values.Add(new WeatherForecast() { TemperatureC = temperature, Date = time });
+            _holder.Values.Add(new WeatherForecast() { TemperatureC = temperature, Date = time });
             return Ok();
         }
 
         [HttpGet("read")]
-        public IActionResult Read()
+        public IActionResult Read([FromQuery] DateTime timeFrom, [FromQuery] DateTime timeTo)
         {
-            return Ok(holder.Values);
+            return Ok(_holder.Values.Where(w => w.Date >= timeFrom && w.Date <= timeTo).ToList());
         }
 
         [HttpPut("update")]
         public IActionResult Update([FromQuery] DateTime time, [FromQuery] int newTemperature)
         {
-            for (int i = 0; i < holder.Values.Count; i++)
+            for (int i = 0; i < _holder.Values.Count; i++)
             {
-                if (holder.Values[i].Date == time)
-                    holder.Values[i] = new WeatherForecast() { TemperatureC = newTemperature, Date = time };
+                if (_holder.Values[i].Date == time)
+                    _holder.Values[i] = new WeatherForecast() { TemperatureC = newTemperature, Date = time };
             }
             return Ok();
         }
@@ -45,12 +44,8 @@ namespace MetricsManager.Controllers
         [HttpDelete("delete")]
         public IActionResult Delete([FromQuery] DateTime timeFrom, [FromQuery] DateTime timeTo)
         {
-            holder.Values = holder.Values.Where(w => w.Date < timeFrom || w.Date > timeTo).ToList();                  
+            _holder.Values = _holder.Values.Where(w => w.Date < timeFrom || w.Date > timeTo).ToList();                  
             return Ok();
-        }
-        public IActionResult Index()
-        {
-            return View();
         }
     }
 }
