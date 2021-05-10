@@ -14,10 +14,14 @@ namespace MetricsAgentTests
         }
 
         [Fact]
-        public void GetAllMetrics_Returns_Ok()
+        public void GetMetricsFromAgent_Returns_Ok()
         {
+            int errorsCount = 10;
+            var fromTime = TimeSpan.FromSeconds(0);
+            var toTime = TimeSpan.FromSeconds(100);
+
             //Act
-            var result = controller.GetAllMetrics();
+            var result = controller.GetMetricsFromAgent(errorsCount, fromTime, toTime);
 
             //Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);

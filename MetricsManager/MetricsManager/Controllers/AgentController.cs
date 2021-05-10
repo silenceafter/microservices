@@ -11,23 +11,15 @@ namespace MetricsManager.Controllers
     [ApiController]
     public class AgentController : ControllerBase
     {
-        private readonly AgentHolder _holder;
-        public AgentController(AgentHolder holder)
-        {
-            _holder = holder;
-        }
-
         [HttpGet("getList")]
         public IActionResult GetRegisteredMetrics()
-        {
-            var result = _holder;
-            return Ok(result);
+        {           
+            return Ok();
         }
 
         [HttpPost("register")]
         public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
         {
-            _holder.AgentList.Add(agentInfo);
             return Ok();
         }
 

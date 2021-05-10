@@ -9,9 +9,5 @@ namespace MetricsManager
     {
         public int AgentId { get; }
         public Uri AgentAddress { get; }
-        public AgentInfo()
-        {
-            //присвоить значения?
-        }
     }
 }

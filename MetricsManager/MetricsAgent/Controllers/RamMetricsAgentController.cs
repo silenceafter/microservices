@@ -11,8 +11,8 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class RamMetricsAgentController : ControllerBase
     {
-        [HttpGet("all")]
-        public IActionResult GetAllMetrics()
+        [HttpGet("from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetricsFromAgent([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {
             return Ok();
         }

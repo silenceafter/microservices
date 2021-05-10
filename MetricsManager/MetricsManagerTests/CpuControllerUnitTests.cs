@@ -24,22 +24,7 @@ namespace MetricsManagerTests
             
             //Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);
-        }
-
-        [Fact]
-        public void GetMetricsByPercentileFromAgent_ReturnsOk()
-        {
-            var agentId = 1;
-            var fromTime = TimeSpan.FromSeconds(0);
-            var toTime = TimeSpan.FromSeconds(100);
-            var percentile = MetricsManager.Enums.Percentile.P75;
-
-            //Act
-            var result = controller.GetMetricsByPercentileFromAgent(agentId, fromTime, toTime, percentile);
-
-            //Assert
-            _ = Assert.IsAssignableFrom<IActionResult>(result);
-        }
+        }       
 
         [Fact]
         public void GetMetricsFromAllCluster_ReturnsOk()
@@ -52,20 +37,6 @@ namespace MetricsManagerTests
 
             //Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);
-        }
-
-        [Fact]
-        public void GetMetricsByPercentileFromAllCluster_ReturnsOk()
-        {
-            var fromTime = TimeSpan.FromSeconds(0);
-            var toTime = TimeSpan.FromSeconds(100);
-            var percentile = MetricsManager.Enums.Percentile.P75;
-
-            //Act
-            var result = controller.GetMetricsByPercentileFromAllCluster(fromTime, toTime, percentile);
-
-            //Assert
-            _ = Assert.IsAssignableFrom<IActionResult>(result);
-        }
+        }      
     }
 }

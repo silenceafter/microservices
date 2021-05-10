@@ -16,10 +16,11 @@ namespace MetricsManagerTests
         public void GetMetricsFromAgent_ReturnsOk()
         {
             var agentId = 1;
-            var available = 1024;
+            var fromTime = TimeSpan.FromSeconds(0);
+            var toTime = TimeSpan.FromSeconds(100);
 
             //Act
-            var result = controller.GetMetricsFromAgent(agentId, available);
+            var result = controller.GetMetricsFromAgent(agentId, fromTime, toTime);
 
             //Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);
