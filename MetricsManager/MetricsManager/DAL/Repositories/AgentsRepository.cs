@@ -22,53 +22,102 @@ namespace MetricsManager.DAL.Repositories
 
         public string GetAddressForAgentId(int id)
         {
-            var ConnectionString = _provider.GetConnectionString();
-            using (var connection = new SQLiteConnection(ConnectionString))
+            try
             {
-                var response = connection.QuerySingle<string>("SELECT AgentAddress FROM agents WHERE AgentId=@agent_id",
-                        new
-                        {
-                            agent_id = id
-                        }).ToList();
+                var ConnectionString = _provider.GetConnectionString();
+                using (var connection = new SQLiteConnection(ConnectionString))
+                {
+                    var response = connection.QuerySingle<string>("SELECT AgentAddress FROM agents WHERE AgentId=@agent_id",
+                            new
+                            {
+                                agent_id = id
+                            }).ToList();
 
-                return response.ToString();
+                    return response.ToString();
+                }
             }
+            catch (Exception myex)
+            {
+                _logger.LogError(myex.Message);
+            }
+            return null;
         }
 
         public IList<AgentInfo> GetAgents()
         {
-            var ConnectionString = _provider.GetConnectionString();
-            using (var connection = new SQLiteConnection(ConnectionString))
+            try
             {
-                return connection.Query<AgentInfo>("SELECT AgentId, AgentAddress FROM agents", null).ToList();
+                var ConnectionString = _provider.GetConnectionString();
+                using (var connection = new SQLiteConnection(ConnectionString))
+                {
+                    return connection.Query<AgentInfo>("SELECT AgentId, AgentAddress FROM agents", null).ToList();
+                }
             }
+            catch (Exception myex)
+            {
+                _logger.LogError(myex.Message);
+            }
+            return null;
         }
 
         public void RegisterAgent(AgentInfo agent)
         {
-            var ConnectionString = _provider.GetConnectionString();
-            using (var connection = new SQLiteConnection(ConnectionString))
+            try
             {
-                connection.Execute("INSERT INTO agents(AgentId,AgentAddress) VALUES(@AgentId,@AgentAddress)",
-                        new
-                        {
-                            AgentId = agent.AgentId,
-                            AgentAddress = agent.AgentAddress.ToString()
-                        });
+                var ConnectionString = _provider.GetConnectionString();
+                using (var connection = new SQLiteConnection(ConnectionString))
+                {
+                    connection.Execute("INSERT INTO agents(AgentId,AgentAddress) VALUES(@AgentId,@AgentAddress)",
+                            new
+                            {
+                                AgentId = agent.AgentId,
+                                AgentAddress = agent.AgentAddress.ToString()
+                            });
+                }
             }
+            catch (Exception myex)
+            {
+                _logger.LogError(myex.Message);
+            }
+            return;
         }
 
         public void RemoveAgent(AgentInfo agent)
         {
-            var ConnectionString = _provider.GetConnectionString();
-            using (var connection = new SQLiteConnection(ConnectionString))
+            try
             {
-                connection.Execute($"DELETE FROM agents WHERE (AgentAddress=@AgentAddress)",
-                        new
-                        {
-                            AgentAddress = agent.AgentAddress
-                        });
+                var ConnectionString = _provider.GetConnectionString();
+                using (var connection = new SQLiteConnection(ConnectionString))
+                {
+                    connection.Execute($"DELETE FROM agents WHERE (AgentAddress=@AgentAddress)",
+                            new
+                            {
+                                AgentAddress = agent.AgentAddress
+                            });
+                }
             }
+            catch (Exception myex)
+            {
+                _logger.LogError(myex.Message);
+            }
+            return;
+        }
+
+        public void RemoveAllAgent()
+        {
+            try
+            {
+                var ConnectionString = _provider.GetConnectionString();
+                using (var connection = new SQLiteConnection(ConnectionString))
+                {
+                    connection.Execute($"DELETE FROM agents", null);
+                }
+            }
+            catch (Exception myex)
+            {
+                _logger.LogError(myex.Message);
+            }
+            return;
         }
     }
 }

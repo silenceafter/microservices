@@ -12,5 +12,6 @@ namespace MetricsManager.DAL.Interfaces
         public void RemoveAgent(AgentInfo agent);
         public IList<AgentInfo> GetAgents();
         public string GetAddressForAgentId(int id);
+        public void RemoveAllAgent();
     }
 }

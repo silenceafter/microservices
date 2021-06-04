@@ -10,18 +10,19 @@ using MetricsManager.DAL.Models;
 using MetricsManager.DAL;
 using System.Data.SQLite;
 using Dapper;
+using MetricsManager.Controllers.Requests;
 
 namespace MetricsManager.Jobs
 {
     [DisallowConcurrentExecution]
-    public class CpuMetricJob : IJob
+    public class RamMetricJob : IJob
     {
-        private ICpuMetricsRepository _repository;
+        private IRamMetricsRepository _repository;
         private readonly IAgentsRepository _agentsRepository;
         private readonly IMetricsAgentClient _metricsAgentClient;
-        private readonly ILogger<CpuMetricJob> _logger;
+        private readonly ILogger<RamMetricJob> _logger;
 
-        public CpuMetricJob(ICpuMetricsRepository repository, IAgentsRepository agentsRepository, IMetricsAgentClient metricsAgentClient, ILogger<CpuMetricJob> logger)
+        public RamMetricJob(IRamMetricsRepository repository, IAgentsRepository agentsRepository, IMetricsAgentClient metricsAgentClient, ILogger<RamMetricJob> logger)
         {
             _repository = repository;
             _agentsRepository = agentsRepository;
@@ -31,7 +32,7 @@ namespace MetricsManager.Jobs
 
         public Task Execute(IJobExecutionContext context)
         {
-            _logger.LogInformation("CpuMetricJob started");
+            _logger.LogInformation("RamMetricJob started");
             var allAgentsList = _agentsRepository.GetAgents();
 
             foreach (var agent in allAgentsList)
@@ -41,8 +42,8 @@ namespace MetricsManager.Jobs
 
                 try
                 {
-                    _logger.LogInformation($"CpuMetricJob try GetCpuMetrics() from {fromTime} to {toTime}, agentAddress {agent.AgentAddress}");
-                    var outerMetrics = _metricsAgentClient.GetCpuMetrics(new GetAllCpuMetricsApiRequest
+                    _logger.LogInformation($"RamMetricJob try GetRamMetrics() from {fromTime} to {toTime}, agentAddress {agent.AgentAddress}");
+                    var outerMetrics = _metricsAgentClient.GetRamMetrics(new GetAllRamMetricsApiRequest
                     {
                         ClientBaseAddress = agent.AgentAddress,
                         fromTime = fromTime,
@@ -53,8 +54,8 @@ namespace MetricsManager.Jobs
                     {
                         foreach (var oneMetric in outerMetrics.Metrics)
                         {
-                            _logger.LogInformation($"CpuMetricJob write cpu metric to DB from agentId {agent.AgentId}, time: {oneMetric.Time}, value: {oneMetric.Value}");
-                            _repository.Create(new CpuMetric
+                            _logger.LogInformation($"RamMetricJob write ram metric to DB from agentId {agent.AgentId}, time: {oneMetric.Time}, value: {oneMetric.Value}");
+                            _repository.Create(new RamMetric
                             {
                                 AgentId = agent.AgentId,
                                 Time = oneMetric.Time.ToUnixTimeSeconds(),
@@ -66,7 +67,7 @@ namespace MetricsManager.Jobs
                 catch (Exception myex)
                 {
                     _logger.LogError(myex.Message);
-                }                
+                }
             }
             return Task.CompletedTask;
         }

@@ -10,18 +10,19 @@ using MetricsManager.DAL.Models;
 using MetricsManager.DAL;
 using System.Data.SQLite;
 using Dapper;
+using MetricsManager.Controllers;
 
-namespace MetricsManager.Jobs
+namespace MetricsManager.Jobs.JobSchedule
 {
     [DisallowConcurrentExecution]
-    public class CpuMetricJob : IJob
+    public class DotNetMetricJob : IJob
     {
-        private ICpuMetricsRepository _repository;
+        private IDotNetMetricsRepository _repository;
         private readonly IAgentsRepository _agentsRepository;
         private readonly IMetricsAgentClient _metricsAgentClient;
-        private readonly ILogger<CpuMetricJob> _logger;
+        private readonly ILogger<DotNetMetricJob> _logger;
 
-        public CpuMetricJob(ICpuMetricsRepository repository, IAgentsRepository agentsRepository, IMetricsAgentClient metricsAgentClient, ILogger<CpuMetricJob> logger)
+        public DotNetMetricJob(IDotNetMetricsRepository repository, IAgentsRepository agentsRepository, IMetricsAgentClient metricsAgentClient, ILogger<DotNetMetricJob> logger)
         {
             _repository = repository;
             _agentsRepository = agentsRepository;
@@ -31,7 +32,7 @@ namespace MetricsManager.Jobs
 
         public Task Execute(IJobExecutionContext context)
         {
-            _logger.LogInformation("CpuMetricJob started");
+            _logger.LogInformation("DotNetMetricJob started");
             var allAgentsList = _agentsRepository.GetAgents();
 
             foreach (var agent in allAgentsList)
@@ -41,8 +42,8 @@ namespace MetricsManager.Jobs
 
                 try
                 {
-                    _logger.LogInformation($"CpuMetricJob try GetCpuMetrics() from {fromTime} to {toTime}, agentAddress {agent.AgentAddress}");
-                    var outerMetrics = _metricsAgentClient.GetCpuMetrics(new GetAllCpuMetricsApiRequest
+                    _logger.LogInformation($"DotNetMetricJob try GetDotNetMetrics() from {fromTime} to {toTime}, agentAddress {agent.AgentAddress}");
+                    var outerMetrics = _metricsAgentClient.GetDotNetMetrics(new GetAllDotNetMetricsApiRequest
                     {
                         ClientBaseAddress = agent.AgentAddress,
                         fromTime = fromTime,
@@ -53,8 +54,8 @@ namespace MetricsManager.Jobs
                     {
                         foreach (var oneMetric in outerMetrics.Metrics)
                         {
-                            _logger.LogInformation($"CpuMetricJob write cpu metric to DB from agentId {agent.AgentId}, time: {oneMetric.Time}, value: {oneMetric.Value}");
-                            _repository.Create(new CpuMetric
+                            _logger.LogInformation($"DotNetMetricJob write dotnet metric to DB from agentId {agent.AgentId}, time: {oneMetric.Time}, value: {oneMetric.Value}");
+                            _repository.Create(new DotNetMetric
                             {
                                 AgentId = agent.AgentId,
                                 Time = oneMetric.Time.ToUnixTimeSeconds(),
@@ -66,7 +67,7 @@ namespace MetricsManager.Jobs
                 catch (Exception myex)
                 {
                     _logger.LogError(myex.Message);
-                }                
+                }
             }
             return Task.CompletedTask;
         }

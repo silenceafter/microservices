@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
+using Dapper;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MetricsManager.DAL.Interfaces;
 using MetricsManager.DAL.Models;
-using Microsoft.Extensions.Logging;
 
 namespace MetricsManager.DAL.Repositories
 {
@@ -21,22 +22,102 @@ namespace MetricsManager.DAL.Repositories
 
         public void Create(NetworkMetric item)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ConnectionString = _provider.GetConnectionString();
+                using (var connection = new SQLiteConnection(ConnectionString))
+                {
+                    connection.Execute("INSERT INTO networkmetrics(AgentId, value, time) VALUES(@agent_id,@value,@time)",
+                    new
+                    {
+                        agent_id = item.AgentId,
+                        value = item.Value,
+                        time = item.Time
+                    });
+                }
+            }
+            catch (Exception myex)
+            {
+                _logger.LogError(myex.Message);
+            }
+            return;
         }
 
         public DateTimeOffset GetLastTimeFromAgent(int agent_id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ConnectionString = _provider.GetConnectionString();
+                using (var connection = new SQLiteConnection(ConnectionString))
+                {
+                    var timeFromAgent = connection.QueryFirstOrDefault<DateTimeOffset>("SELECT time FROM networkmetrics WHERE AgentId = @agent_id ORDER BY id DESC",
+                    new
+                    {
+                        agent_id = agent_id
+                    });
+
+                    DateTimeOffset lastTime = DateTimeOffset.UtcNow;
+                    if (timeFromAgent.Year == 1)
+                    {
+                        lastTime = DateTimeOffset.UnixEpoch;
+                    }
+                    else
+                    {
+                        lastTime = timeFromAgent;
+                    }
+                    return lastTime;
+                }
+            }
+            catch (Exception myEx)
+            {
+                _logger.LogError(myEx.Message);
+            }
+            return DateTimeOffset.UtcNow;
         }
 
         public IList<NetworkMetric> GetMetricsFromAgent(int agentId, DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ConnectionString = _provider.GetConnectionString();
+                using (var connection = new SQLiteConnection(ConnectionString))
+                {
+                    return connection.Query<NetworkMetric>("SELECT * FROM networkmetrics WHERE AgentId = @agentId AND time >= @fromTime AND time <= @toTime",
+                        new
+                        {
+                            fromTime = fromTime.ToUnixTimeSeconds(),
+                            toTime = toTime.ToUnixTimeSeconds(),
+                            agentId = agentId
+                        }).ToList();
+                }
+            }
+            catch (Exception myex)
+            {
+                _logger.LogError(myex.Message);
+            }
+            return null;
         }
 
         public IList<NetworkMetric> GetMetricsFromAllCluster(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ConnectionString = _provider.GetConnectionString();
+                using (var connection = new SQLiteConnection(ConnectionString))
+                {
+                    return connection.Query<NetworkMetric>("SELECT * FROM networkmetrics WHERE (time>=@fromTime) AND (time<=@toTime)",
+                        new
+                        {
+                            fromTime = fromTime.ToUnixTimeSeconds(),
+                            toTime = toTime.ToUnixTimeSeconds(),
+                        }).ToList();
+                }
+            }
+            catch (Exception myex)
+            {
+                _logger.LogError(myex.Message);
+            }
+            return null;
         }
     }
 }

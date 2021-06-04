@@ -44,12 +44,5 @@ namespace MetricsAgent.Controllers
             }
             return Ok(response);
         }
-
-        [HttpGet("errorsCount/{errorsCount}/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsFromAgent([FromRoute] int errorsCount, [FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
-        {
-            _logger.LogInformation($"errorsCount = {errorsCount}, fromTime = {fromTime}, toTime = {toTime}");
-            return Ok();
-        }
     }
 }

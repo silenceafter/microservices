@@ -43,9 +43,6 @@ namespace MetricsManager.Controllers
             {
                 response.Metrics.Add(_mapper.Map<CpuMetricDto>(metric));
             }
-
-            //var request = new HttpRequestMessage(HttpMethod.Get, "");
-
             return Ok(response);
         }    
 

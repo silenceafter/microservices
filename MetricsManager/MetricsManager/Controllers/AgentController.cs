@@ -46,18 +46,12 @@ namespace MetricsManager.Controllers
             return Ok();
         }
 
-        [HttpPut("enable/{agentId}")]
-        public IActionResult EnableAgentById([FromRoute] int agentId)
+        [HttpPost("removeAll")]
+        public IActionResult RemoveAllAgent([FromRoute] bool parameter)
         {
-            _logger.LogInformation($"agentId = {agentId}");
+            _logger.LogInformation($"RemoveAll AgentAddress");
+            _repository.RemoveAllAgent();
             return Ok();
         }
-
-        [HttpPut("disable/{agentId}")]
-        public IActionResult DisableAgentById([FromRoute] int agentId)
-        {
-            _logger.LogInformation($"agentId = {agentId}");
-            return Ok();
-        }      
     }
 }
